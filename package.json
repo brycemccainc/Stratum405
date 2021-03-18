@@ -10,6 +10,7 @@
     "bootstrap": "^4.6.0",
     "build": "^0.1.4",
     "configure": "0.0.1",
+    "js-yaml": "^3.14.1",
     "mount-js": "0.0.9",
     "node-waf": "^1.0.0",
     "react": "^17.0.1",
