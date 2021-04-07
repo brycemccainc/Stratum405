@@ -56,16 +56,16 @@ var state = {
     selectedFile: null
 };
 
-// On file select (from the pop up)
+// On file select (from the pop up)s
 function onFileChange(event) {
 
     // Update the state
     this.setState({ 
         selectedFile: event.target.files[0] 
     });
+  
 
 }
-
 // On file upload (click the upload button)
 function onFileUpload() {
 
@@ -127,7 +127,7 @@ const Demo = () => {
             <h1> View/Edit Hierarchies</h1>
             < Tree loadData={onLoadData} treeData={treeData} />
             <div>
-                <input type="file" onChange={onFileChange} />
+                <input type="file" onChange={()=>onFileChange} />
                 <button onClick={onFileUpload}>
                     Upload!
                 </button>
