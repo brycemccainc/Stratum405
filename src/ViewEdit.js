@@ -128,9 +128,9 @@ const Demo = () => {
             < Tree loadData={onLoadData} treeData={treeData} />
             <div>
                 <input type="file" onChange={()=>onFileChange} />
-                <button onClick={onFileUpload}>
+                {/*<button onClick={onFileUpload}>
                     Upload!
-                </button>
+                   </button>*/}
             </div>
             {fileData()}
         </div>
