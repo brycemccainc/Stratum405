@@ -2,6 +2,8 @@
 import { Tree } from 'antd';
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
+
 //import ReactDOM from 'react-dom';
 //import mountNode from "mount-js";
 //import App from './App';
@@ -10,81 +12,156 @@ import Button from 'react-bootstrap/Button';
 
 
 const initTreeDate = [
-  {
-    title: 'Region',
-    key: '0',
-  },
-  {
-    title: 'Market',
-    key: '1',
-  },
-  {
-    title: 'DOS',
-    key: '2',
-  },
-  {
-    title: 'ARSMS',
-    key: '3',
-  },
-  {
-    title: 'Stores',
-    key: '4',
-    //isLeaf: true,
-  },
+    {
+        title: 'Region',
+        key: '0',
+    },
+    {
+        title: 'Market',
+        key: '1',
+    },
+    {
+        title: 'DOS',
+        key: '2',
+    },
+    {
+        title: 'ARSMS',
+        key: '3',
+    },
+    {
+        title: 'Stores',
+        key: '4',
+        //isLeaf: true,
+    },
 ]; // It's just a simple demo. You can use tree map to optimize update perf.
 
 function ViewEdit(list, key, children) {
 
-  return list.map((node) => {
-    if (node.key === key) {
-      return { ...node, children };
-    }
+    return list.map((node) => {
+        if (node.key === key) {
+            return { ...node, children };
+        }
 
-    if (node.children) {
-      return { ...node, children: ViewEdit(node.children, key, children) };
-    }
+        if (node.children) {
+            return { ...node, children: ViewEdit(node.children, key, children) };
+        }
 
-    return node;
-  });
+        return node;
+    });
 }
 
-const Demo = () => {
-  const [treeData, setTreeData] = useState(initTreeDate);
-  return (
-    <div>
-        <h1> View/Edit Hierarchies</h1>
-        < Tree loadData={onLoadData} treeData={treeData} />
-        <Button href="#">Import</Button> {' '}
-    </div>
-  )
+var state = {
 
-  function onLoadData({ key, children }) {
-    return new Promise((resolve) => {
-      if (children) {
-        resolve();
-        return;
-      }
+    // Initially, no file is selected
+    selectedFile: null
+};
 
-      setTimeout(() => {
-        setTreeData((origin) =>
-          ViewEdit(origin, key, [
-            {
-              title: 'Example Child',
-              key: `${key}-0`,
-            },
-            /*{
-              title: 'Child 2',
-              key: `${key}-1`,
-            }, */
-          ]),
-        );
-        resolve();
-      }, 1000);
+// On file select (from the pop up)s
+function onFileChange(event) {
+
+    // Update the state
+    this.setState({ 
+        selectedFile: event.target.files[0] 
     });
-  }
-
   
-  //return <Tree loadData={onLoadData} treeData={treeData} />;
+
+}
+// On file upload (click the upload button)
+function onFileUpload() {
+
+    // Create an object of formData
+    const formData = new FormData();
+
+    // Update the formData object
+    formData.append(
+        "myFile",
+        state.selectedFile,
+        state.selectedFile.name
+    );
+
+    // Details of the uploaded file
+    console.log(state.selectedFile);
+
+    // Request made to the backend api
+    // Send formData object
+    axios.post("api/uploadfile", formData);
+};
+
+// File content to be displayed after
+// file upload is complete
+function fileData() {
+
+    if (state.selectedFile) {
+
+        return (
+            <div>
+                <h2>File Details:</h2>
+
+                <p>File Name: {state.selectedFile.name}</p>
+
+
+                <p>File Type: {state.selectedFile.type}</p>
+
+
+                <p>
+                    Last Modified:{" "}
+                    {state.selectedFile.lastModifiedDate.toDateString()}
+                </p>
+
+            </div>
+        );
+    } else {
+        return (
+            <div>
+                <br />
+                <h4>Choose before Pressing the Upload button</h4>
+            </div>
+        );
+    }
+};
+
+const Demo = () => {
+    const [treeData, setTreeData] = useState(initTreeDate);
+    return (
+        <div>
+            <h1> View/Edit Hierarchies</h1>
+            < Tree loadData={onLoadData} treeData={treeData} />
+            <div>
+                <input type="file" onChange={()=>onFileChange} />
+                <button onClick={onFileUpload}>
+                    Upload!
+                </button>
+            </div>
+            {fileData()}
+        </div>
+    )
+
+    function onLoadData({ key, children }) {
+        return new Promise((resolve) => {
+            if (children) {
+                resolve();
+                return;
+            }
+
+            setTimeout(() => {
+                setTreeData((origin) =>
+                    ViewEdit(origin, key, [
+                        {
+                            title: 'Example Child',
+                            key: `${key}-0`,
+                        },
+                        /*{
+                          title: 'Child 2',
+                          key: `${key}-1`,
+                        }, */
+                    ]),
+                );
+                resolve();
+            }, 1000);
+        });
+    }
+
+    //return <Tree loadData={onLoadData} treeData={treeData} />;
 
 };
 
